@@ -1,7 +1,8 @@
 {
-  "name": "vhr-mobile",
+  "name": "virtual-hr-mobile",
   "main": "expo-router/entry",
   "version": "1.0.0",
+   "author": "Harshana Srimal <harshana@builtapps.com> (https://harshanasrimal.com)",
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
