@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "vhr-mobile",
-    "slug": "vhr-mobile",
+    "name": "Virtual HR",
+    "slug": "virtual-hr",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,14 +9,17 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.harshanasrimal.vhr",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.harshanasrimal.vhr"
+      "package": "com.harshanasrimal.vhr",
+      "versionCode": 2
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +40,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "50f9d983-8342-48c2-9c1a-aea264b8dcc3"
+      }
     }
   }
 }
