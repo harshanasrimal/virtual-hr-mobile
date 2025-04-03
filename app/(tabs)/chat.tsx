@@ -15,12 +15,14 @@ import { MotiView } from "moti";
 import { sendMessage } from "@/services/chatService";
 import TypingDots from "@/components/TypingDots";
 import dayjs from "@/utils/dayjs";
+import { getUser } from "@/services/userManager";
 
-const AVATAR_USER = "https://randomuser.me/api/portraits/men/11.jpg";
 const AVATAR_BOT = "https://randomuser.me/api/portraits/women/79.jpg";
 
 export default function ChatScreen() {
   const [now, setNow] = useState(new Date());
+  const [user, setUser] = useState<any>(null);
+  const [AVATAR_USER, setUserAvatar] = useState("https://hr.harshanasrimal.com/images/user.jpg");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([
     {
@@ -34,12 +36,24 @@ export default function ChatScreen() {
 
   const scrollRef = useRef<ScrollView>(null);
 
+    useEffect(() => {
+      const loadUser = async () => {
+        const u = await getUser();
+        setUser(u);
+        if (u) {
+          setUserAvatar(u.image);
+        }
+      };
+  
+      loadUser();
+    }, []);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setNow(new Date());
     }, 60000);
   
-    return () => clearInterval(interval); // cleanup on unmount
+    return () => clearInterval(interval);
   }, []);
 
 
