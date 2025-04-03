@@ -7,19 +7,31 @@ import {
   Image,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import { logo } from "@/assets";
 import { router } from "expo-router";
+import { login } from "@/services/authService";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async() => {
+    console.log("Login button pressed");
     // TODO: Connect with Auth API
-router.replace('/');
-    console.log("Logging in with:", email, password);
+    const auth = await login(email, password);
+    if (auth) {
+      router.replace('/');
+      console.log("Login successful");
+    } else {
+      console.log("Login failed");
+    }
   };
+
+  const handleForgotPassword = () => {
+    Alert.alert("Disabled", "Please contact the administrator.");
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -58,7 +70,7 @@ router.replace('/');
         <Text className="text-white text-center font-semibold">Login</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity className="mt-4">
+      <TouchableOpacity className="mt-4" onPress={handleForgotPassword}>
         <Text className="text-sm text-blue-500 text-center">Forgot Password?</Text>
       </TouchableOpacity>
     </View>

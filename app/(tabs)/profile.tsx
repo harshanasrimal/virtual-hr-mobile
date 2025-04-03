@@ -1,4 +1,5 @@
 // app/(tabs)/profile.tsx
+import { logout } from "@/services/authService";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -41,10 +42,10 @@ export default function ProfileScreen() {
     Alert.alert("Success", "Password changed successfully.");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
+    await logout();
     Alert.alert("Logged Out", "You have been logged out.");
     router.replace('/auth/login');
-    // TODO: Clear session and navigate to login
   };
 
   return (

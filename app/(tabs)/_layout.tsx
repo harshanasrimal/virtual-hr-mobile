@@ -19,7 +19,7 @@ export default function TabLayout() {
         },
         tabBarIcon: ({ focused, color, size }) => {
           const iconMap: Record<string, string> = {
-            index: "chatbubbles-outline",
+            chat: "chatbubbles-outline",
             documents: "document-text-outline",
             leaves: "calendar-outline",
             profile: "person-outline",
@@ -37,7 +37,7 @@ export default function TabLayout() {
         },
       })}
     >
-      <Tabs.Screen name="index" />
+      <Tabs.Screen name="chat" />
       <Tabs.Screen name="documents" />
       <Tabs.Screen name="leaves" />
       <Tabs.Screen name="profile" />

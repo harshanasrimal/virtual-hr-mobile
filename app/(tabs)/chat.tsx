@@ -47,7 +47,7 @@ export default function ChatScreen() {
       const reply = {
         id: Date.now() + 1,
         from: "assistant",
-        text: "Got it! I’ll process that for you.",
+        text: "Could you please provide me with the type of leave you would like to request (ANNUAL, CASUAL, or MEDICAL), the reason for your leave, and the end date for the leave?",
         time: "Just now",
       };
       setMessages((prev) => [...prev, reply]);
