@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,47 +12,74 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
+import { sendMessage } from "@/services/chatService";
+import TypingDots from "@/components/TypingDots";
+import dayjs from "@/utils/dayjs";
 
 const AVATAR_USER = "https://randomuser.me/api/portraits/men/11.jpg";
-const AVATAR_BOT = "https://randomuser.me/api/portraits/women/44.jpg";
+const AVATAR_BOT = "https://randomuser.me/api/portraits/women/79.jpg";
 
 export default function ChatScreen() {
+  const [now, setNow] = useState(new Date());
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([
     {
       id: 1,
       from: "assistant",
-      text: "Hello! How can I help you today?",
-      time: "Just now",
+      text: "Hello! How can I assist you?",
+      time: new Date(),
     },
   ]);
+  const [loading, setLoading] = useState(false);
 
   const scrollRef = useRef<ScrollView>(null);
 
-  const handleSend = () => {
-    if (!message.trim()) return;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 60000);
+  
+    return () => clearInterval(interval); // cleanup on unmount
+  }, []);
+
+
+  const handleSend = async () => {
+    if (!message.trim() || loading) return;
 
     const userMsg = {
       id: Date.now(),
       from: "user",
       text: message.trim(),
-      time: "Just now",
+      time: new Date(),
     };
 
     setMessages((prev) => [...prev, userMsg]);
     setMessage("");
+    setLoading(true);
 
-    // You can replace this dummy reply with real API call later
-    setTimeout(() => {
-      const reply = {
+    try {
+      const reply = await sendMessage(userMsg.text);
+      const botMsg = {
         id: Date.now() + 1,
         from: "assistant",
-        text: "Could you please provide me with the type of leave you would like to request (ANNUAL, CASUAL, or MEDICAL), the reason for your leave, and the end date for the leave?",
-        time: "Just now",
+        text: reply,
+        time: new Date(),
       };
-      setMessages((prev) => [...prev, reply]);
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          from: "assistant",
+          text: "Oops! I couldn't process your request right now.",
+          time: new Date(),
+        },
+      ]);
+    } finally {
+      setLoading(false);
       scrollRef.current?.scrollToEnd({ animated: true });
-    }, 700);
+    }
   };
 
   const renderMessage = (msg: any, index: number) => {
@@ -88,7 +115,7 @@ export default function ChatScreen() {
               isUser ? "text-white/70 text-right" : "text-gray-500"
             }`}
           >
-            {msg.time}
+            {dayjs(msg.time).fromNow()}
           </Text>
         </View>
         {isUser && (
@@ -110,7 +137,9 @@ export default function ChatScreen() {
         {/* Header */}
         <View className="px-4 py-4 border-b border-gray-200 bg-white items-center">
           <Text className="text-2xl font-bold text-gray-800">HR Assistant</Text>
-          <Text className="text-xs text-green-500 mt-1">Online</Text>
+          <Text className="text-xs text-green-500 mt-1">
+            {loading ? "Typing..." : "Online"}
+          </Text>
         </View>
 
         {/* Messages */}
@@ -122,24 +151,45 @@ export default function ChatScreen() {
           }
         >
           {messages.map((msg, index) => renderMessage(msg, index))}
+          {loading && (
+            <MotiView
+              from={{ opacity: 0, translateY: 10 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: "timing", delay: messages.length * 100 }}
+              className="flex-row mb-4 justify-start"
+            >
+              <Image
+                source={{ uri: AVATAR_BOT }}
+                className="w-8 h-8 rounded-full mr-2 mt-auto"
+              />
+              <View className="bg-gray-100 px-4 py-2 rounded-2xl rounded-bl-none">
+                <TypingDots />
+              </View>
+            </MotiView>
+          )}
+          
         </ScrollView>
 
         {/* Input Area */}
         <View className="flex-row items-center px-4 py-3 border-t border-gray-200 bg-white">
           <TextInput
             className="flex-1 bg-gray-100 rounded-full px-4 py-2 pb-4 text-base"
-            style={{ textAlignVertical: 'top' }}
+            style={{ textAlignVertical: "top" }}
             placeholder="Type a message..."
             value={message}
             onChangeText={setMessage}
+            editable={!loading}
           />
 
-          <TouchableOpacity
-            onPress={handleSend}
-            className="ml-2 bg-blue-600 p-3 rounded-full"
-          >
-            <Ionicons name="send" size={20} color="white" />
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleSend}
+          disabled={loading || !message.trim()}
+          className={`ml-2 p-3 rounded-full ${
+            loading || !message.trim() ? "bg-gray-300" : "bg-blue-600"
+          }`}
+        >
+          <Ionicons name="send" size={20} color="white" />
+        </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
