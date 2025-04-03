@@ -20,12 +20,11 @@ export default function LoginScreen() {
   const handleLogin = async() => {
     console.log("Login button pressed");
     // TODO: Connect with Auth API
-    const auth = await login(email, password);
-    if (auth) {
+    const user = await login(email, password);
+    if (user) {
       router.replace('/');
-      console.log("Login successful");
     } else {
-      console.log("Login failed");
+      Alert.alert("Login Failed", "Invalid email or password.");
     }
   };
 

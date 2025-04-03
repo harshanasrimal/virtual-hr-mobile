@@ -1,7 +1,8 @@
 // app/(tabs)/profile.tsx
 import { logout } from "@/services/authService";
+import { getUser } from "@/services/userManager";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -14,20 +15,20 @@ import {
 } from "react-native";
 
 export default function ProfileScreen() {
+  const [user, setUser] = useState<any>(null);
   const [current, setCurrent] = useState("");
   const [newPass, setNewPass] = useState("");
   const [confirm, setConfirm] = useState("");
 
-  // Mock user data (replace with real API data)
-  const user = {
-    name: "Saman Perera",
-    employeeId: 1,
-    email: "saman@harshanasrimal.com",
-    designation: "Software Engineer",
-    joined: "2022-07-15",
-    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-  };
+  useEffect(() => {
+    const loadUser = async () => {
+      const u = await getUser();
+      setUser(u);
+    };
 
+    loadUser();
+  }, []);
+  
   const handleChangePassword = () => {
     if (!current || !newPass || !confirm) {
       Alert.alert("Error", "Please fill in all fields.");
@@ -54,28 +55,32 @@ export default function ProfileScreen() {
         {/* Header */}
         <View className="items-center mb-6">
           <Image
-            source={{ uri: user.avatar }}
+            source={{ uri: user?.image }}
             className="w-24 h-24 rounded-full mb-3"
           />
-          <Text className="text-xl font-bold text-gray-900">{user.name}</Text>
-          <Text className="text-sm text-gray-500">{user.designation}</Text>
+          <Text className="text-xl font-bold text-gray-900">{user?.profile?.firstName} {user?.profile?.lastName}</Text>
+          <Text className="text-sm text-gray-500">{user?.profile?.designation}</Text>
         </View>
 
         {/* Info Card */}
         <View className="bg-gray-50 rounded-xl border border-gray-200 p-4 mb-8">
-          <Text className="text-sm text-gray-500">Employee ID</Text>
+          <Text className="text-sm text-gray-500">NIC</Text>
           <Text className="text-base font-semibold text-gray-800 mb-3">
-            {user.employeeId}
+            {user?.profile?.nic}
           </Text>
 
           <Text className="text-sm text-gray-500">Email</Text>
           <Text className="text-base font-semibold text-gray-800 mb-3">
-            {user.email}
+            {user?.email}
           </Text>
 
           <Text className="text-sm text-gray-500">Joined Date</Text>
           <Text className="text-base font-semibold text-gray-800">
-            {user.joined}
+            {user?.profile?.joinedDate ? new Date(user.profile.joinedDate).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            }).split('/').join('-') : ''}
           </Text>
         </View>
 
