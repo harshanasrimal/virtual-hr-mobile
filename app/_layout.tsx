@@ -1,4 +1,3 @@
-// app/_layout.tsx
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -12,7 +11,6 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   useEffect(() => {
-    // Simulate ready (you can wait for fonts, session, etc. here)
     const timeout = setTimeout(() => {
       SplashScreen.hideAsync();
     }, 500); // simulate delay

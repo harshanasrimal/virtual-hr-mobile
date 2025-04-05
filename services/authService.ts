@@ -22,3 +22,13 @@ export const logout = async () => {
   await clearToken();
     await clearUser();
 };
+
+export const changePassword = async (data: {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}) => {
+  const res = await API.post("/auth/change-password", data);
+  console.log(res);
+  return res.data;
+};

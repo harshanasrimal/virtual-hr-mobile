@@ -1,5 +1,4 @@
-// app/(tabs)/profile.tsx
-import { logout } from "@/services/authService";
+import { logout, changePassword } from "@/services/authService";
 import { getUser } from "@/services/userManager";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -19,6 +18,7 @@ export default function ProfileScreen() {
   const [current, setCurrent] = useState("");
   const [newPass, setNewPass] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -28,8 +28,8 @@ export default function ProfileScreen() {
 
     loadUser();
   }, []);
-  
-  const handleChangePassword = () => {
+
+  const handleChangePassword = async () => {
     if (!current || !newPass || !confirm) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
@@ -40,13 +40,38 @@ export default function ProfileScreen() {
       return;
     }
 
-    Alert.alert("Success", "Password changed successfully.");
+    setLoading(true);
+    try {
+      await changePassword({
+        oldPassword: current,
+        newPassword: newPass,
+        confirmPassword: confirm,
+      });
+
+      Alert.alert("Success", "Password changed successfully. Please login again.", [
+        {
+          text: "OK",
+          onPress: async () => {
+            await logout();
+            router.replace("/auth/login");
+          },
+        },
+      ]);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message?.message || "Failed to change password.";
+      Alert.alert("Error", msg);
+    } finally {
+      setLoading(false);
+      setCurrent("");
+      setNewPass("");
+      setConfirm("");
+    }
   };
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     await logout();
     Alert.alert("Logged Out", "You have been logged out.");
-    router.replace('/auth/login');
+    router.replace("/auth/login");
   };
 
   return (
@@ -58,7 +83,9 @@ export default function ProfileScreen() {
             source={{ uri: user?.image }}
             className="w-24 h-24 rounded-full mb-3"
           />
-          <Text className="text-xl font-bold text-gray-900">{user?.profile?.firstName} {user?.profile?.lastName}</Text>
+          <Text className="text-xl font-bold text-gray-900">
+            {user?.profile?.firstName} {user?.profile?.lastName}
+          </Text>
           <Text className="text-sm text-gray-500">{user?.profile?.designation}</Text>
         </View>
 
@@ -76,18 +103,18 @@ export default function ProfileScreen() {
 
           <Text className="text-sm text-gray-500">Joined Date</Text>
           <Text className="text-base font-semibold text-gray-800">
-            {user?.profile?.joinedDate ? new Date(user.profile.joinedDate).toLocaleDateString('en-GB', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric'
-            }).split('/').join('-') : ''}
+            {user?.profile?.joinedDate
+              ? new Date(user.profile.joinedDate).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }).split("/").join("-")
+              : ""}
           </Text>
         </View>
 
         {/* Change Password Section */}
-        <Text className="text-lg font-bold text-gray-800 mb-3">
-          Change Password
-        </Text>
+        <Text className="text-lg font-bold text-gray-800 mb-3">Change Password</Text>
 
         <TextInput
           className="border border-gray-300 rounded-xl px-4 py-3 mb-3"
@@ -112,11 +139,12 @@ export default function ProfileScreen() {
         />
 
         <TouchableOpacity
-          className="bg-blue-600 py-4 rounded-xl mb-6"
+          className={`bg-blue-600 py-4 rounded-xl mb-6 ${loading ? "opacity-50" : ""}`}
           onPress={handleChangePassword}
+          disabled={loading}
         >
           <Text className="text-white text-center font-semibold">
-            Update Password
+            {loading ? "Updating..." : "Update Password"}
           </Text>
         </TouchableOpacity>
 
