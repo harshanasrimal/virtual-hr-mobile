@@ -1,50 +1,118 @@
-# Welcome to your Expo app 👋
+# Virtual HR - Setup Guide
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Virtual HR is an AI-powered HR assistant system built to streamline leave management, document generation, and employee support using conversational AI.
 
-## Get started
+This project consists of:
+- 💼 **Admin Panel** (`virtual-hr-admin`) – Web dashboard for HR/admins
+- 🤖 **Backend API** (`virtual-hr-api`) – Built with NestJS, MySQL, and OpenAI
+- 📱 **Mobile App** (`virtual-hr-mobile`) – React Native app for employee access
 
-1. Install dependencies
+---
 
+## 🚀 Getting Started
+
+### 📦 Clone the Repositories
+
+```bash
+git clone https://github.com/harshanasrimal/virtual-hr-api.git
+git clone https://github.com/harshanasrimal/virtual-hr-admin.git
+git clone https://github.com/harshanasrimal/virtual-hr-mobile.git
+```
+
+---
+
+## 🧠 Backend API (`virtual-hr-api`)
+
+### 🔧 Setup
+
+1. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
-
-   ```bash
-    npx expo start
+2. Configure environment variables by creating a `.env` file:
+   ```env
+   DATABASE_URL=mysql://user:password@localhost:3306/your_database
+   OPENAI_API_KEY=your_openai_key
+   JWT_SECRET=your_jwt_secret
    ```
 
-In the output, you'll find options to open the app in a
+3. Generate and run Prisma migrations:
+   ```bash
+   npx prisma generate
+   npx prisma migrate dev
+   ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+4. Start the development server:
+   ```bash
+   npm run start:dev
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 🌐 Admin Panel (`virtual-hr-admin`)
 
-When you're ready, run:
+### 🔧 Setup
 
-```bash
-npm run reset-project
-```
+1. Navigate into the project directory:
+   ```bash
+   cd virtual-hr-admin
+   ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-## Learn more
+3. Configure API base URL in `src/services/api.ts`:
+   ```ts
+   const baseURL = import.meta.env.PROD
+     ? 'https://hr-api.harshanasrimal.com'
+     : '/api'; // Used with Vite dev proxy
+   ```
 
-To learn more about developing your project with Expo, look at the following resources:
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## 📱 Mobile App (`virtual-hr-mobile`)
 
-Join our community of developers creating universal apps.
+### 🔧 Setup
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. Navigate into the project directory:
+   ```bash
+   cd virtual-hr-mobile
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Update API base URL in your config (e.g., `config.ts` or `.env`):
+   ```ts
+   export const BASE_URL = 'https://hr-api.harshanasrimal.com';
+   ```
+
+4. Start Expo development server:
+   ```bash
+   npx expo start
+   ```
+
+5. Scan the QR code using the Expo Go app on your mobile device or run on an emulator.
+
+---
+
+## ✅ Notes
+
+- Make sure MySQL is running locally and accessible using the credentials in your `.env` file.
+- Ensure CORS is enabled in the backend to allow requests from `https://hr.harshanasrimal.com`.
+- In production, set up Nginx to serve the frontend and proxy API requests appropriately.
+- The backend uses OpenAI’s API for chat interactions — ensure your key is valid and has access.
+
+---
+
+Happy coding! 💻✨
